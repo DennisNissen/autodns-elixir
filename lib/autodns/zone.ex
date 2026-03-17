@@ -1,0 +1,35 @@
+defmodule AutoDNS.Zone do
+  @moduledoc "Struct representing an AutoDNS DNS zone."
+  use AutoDNS.Schema,
+    fields: [
+      :origin,
+      :idn,
+      :virtualNameServer,
+      :resourceRecords,
+      :rrCount,
+      :domainsafe,
+      :source,
+      :comment,
+      :name,
+      :main,
+      :soa,
+      :action,
+      :grants,
+      :owner,
+      :updater,
+      :logId,
+      :dnssec,
+      :dnssecData,
+      :nameServers,
+      :nameServerGroup,
+      :nameServerEntries,
+      :wwwInclude,
+      :lastChangeDate,
+      :created,
+      :updated,
+      :primaryNameServer,
+      :masterDnssec,
+      :type,
+      :zone
+    ]
+end

@@ -1,0 +1,37 @@
+defmodule AutoDNS.User do
+  @moduledoc "Struct representing an AutoDNS user."
+  use AutoDNS.Schema,
+    fields: [
+      :user,
+      :context,
+      :defaultEmail,
+      :status,
+      :substatus,
+      :fName,
+      :lName,
+      :organization,
+      :language,
+      :passwordExpired,
+      :phone,
+      :fax,
+      :mobile,
+      :details,
+      :acls,
+      :profiles,
+      :ancestors,
+      :customer,
+      :nameServerGroups,
+      :subscriptions,
+      :applications,
+      :passwordPolicy,
+      :authType,
+      :owner,
+      :updater,
+      :created,
+      :updated,
+      :logId,
+      :comment,
+      :locks,
+      :serviceProfiles
+    ]
+end

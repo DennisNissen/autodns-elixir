@@ -1,0 +1,35 @@
+defmodule AutoDNS.Contact do
+  @moduledoc "Struct representing an AutoDNS contact."
+  use AutoDNS.Schema,
+    fields: [
+      :id,
+      :type,
+      :alias,
+      :fname,
+      :lname,
+      :organization,
+      :title,
+      :address,
+      :pcode,
+      :city,
+      :country,
+      :state,
+      :email,
+      :phone,
+      :fax,
+      :nicRef,
+      :extensions,
+      :comment,
+      :domainsafe,
+      :verification,
+      :protection,
+      :sip,
+      :oid,
+      :remarks,
+      :owner,
+      :updater,
+      :created,
+      :updated,
+      :logId
+    ]
+end
