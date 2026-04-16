@@ -460,7 +460,11 @@ defmodule AutoDNS.MockServer do
   end
 
   patch "/zone/:name/:vns" do
-    autodns_json(conn, 200, Map.merge(%{"origin" => name, "virtualNameServer" => vns}, conn.body_params))
+    autodns_json(
+      conn,
+      200,
+      Map.merge(%{"origin" => name, "virtualNameServer" => vns}, conn.body_params)
+    )
   end
 
   get "/zone/:name/:vns" do
@@ -472,7 +476,11 @@ defmodule AutoDNS.MockServer do
   end
 
   put "/zone/:name/:vns" do
-    autodns_json(conn, 200, Map.merge(%{"origin" => name, "virtualNameServer" => vns}, conn.body_params))
+    autodns_json(
+      conn,
+      200,
+      Map.merge(%{"origin" => name, "virtualNameServer" => vns}, conn.body_params)
+    )
   end
 
   delete "/zone/:name/:vns" do
