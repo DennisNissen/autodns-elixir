@@ -2,7 +2,7 @@
 
 Elixir client for the [AutoDNS JSON API](https://help.internetx.com/pages/viewpage.action?pageId=14878418) by InterNetX.
 
-[![CI](https://github.com/DennisNissen/autodns-elixir/actions/workflows/ci.yml/badge.svg)](https://github.com/DennisNissen/autodns-elixir/actions/workflows/ci.yml)
+[![CI](https://github.com/DennisNissen/autodns-elixir/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DennisNissen/autodns-elixir/actions/workflows/ci.yml)
 
 ## Installation
 
