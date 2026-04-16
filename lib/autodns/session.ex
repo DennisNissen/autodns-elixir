@@ -9,15 +9,12 @@ defmodule AutoDNS.Session do
 
   """
 
-  alias AutoDNS.Client
+  alias AutoDNS.{AuthSession, Client, Response}
 
   @doc "Creates a new session (login)."
-  @spec login(Client.t(), map()) ::
-          {:ok, AutoDNS.AuthSession.t()} | {:error, AutoDNS.Error.t()}
+  @spec login(Client.t(), map()) :: {:ok, AuthSession.t()} | {:error, AutoDNS.Error.t()}
   def login(client, attrs \\ %{}) do
-    with {:ok, response} <- Client.post(client, "/login", attrs) do
-      {:ok, AutoDNS.AuthSession.from_map(response.object || response.body)}
-    end
+    Client.post(client, "/login", attrs) |> Response.to_struct(AuthSession)
   end
 
   @doc "Ends the current session (logout via GET)."

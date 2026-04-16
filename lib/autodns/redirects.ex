@@ -12,51 +12,38 @@ defmodule AutoDNS.Redirects do
 
   """
 
-  alias AutoDNS.Client
+  alias AutoDNS.{Client, Redirect, Response}
 
   @base_path "/redirect"
 
   @doc "Creates a new redirect."
-  @spec create(Client.t(), map()) ::
-          {:ok, AutoDNS.Redirect.t()} | {:error, AutoDNS.Error.t()}
+  @spec create(Client.t(), map()) :: {:ok, Redirect.t()} | {:error, AutoDNS.Error.t()}
   def create(client, attrs) do
-    with {:ok, response} <- Client.post(client, @base_path, attrs) do
-      {:ok, AutoDNS.Redirect.from_map(response.object || response.body)}
-    end
+    Client.post(client, @base_path, attrs) |> Response.to_struct(Redirect)
   end
 
   @doc "Searches for redirects."
-  @spec list(Client.t(), map()) ::
-          {:ok, [AutoDNS.Redirect.t()]} | {:error, AutoDNS.Error.t()}
+  @spec list(Client.t(), map()) :: {:ok, [Redirect.t()]} | {:error, AutoDNS.Error.t()}
   def list(client, query \\ %{}) do
-    with {:ok, response} <- Client.post(client, "#{@base_path}/_search", query) do
-      {:ok, AutoDNS.Redirect.from_list(response.data || [])}
-    end
+    Client.post(client, "#{@base_path}/_search", query) |> Response.to_list(Redirect)
   end
 
   @doc "Gets a redirect by source."
-  @spec get(Client.t(), String.t()) ::
-          {:ok, AutoDNS.Redirect.t()} | {:error, AutoDNS.Error.t()}
+  @spec get(Client.t(), String.t()) :: {:ok, Redirect.t()} | {:error, AutoDNS.Error.t()}
   def get(client, source) do
-    with {:ok, response} <- Client.get(client, "#{@base_path}/#{source}") do
-      {:ok, AutoDNS.Redirect.from_map(response.object || response.body)}
-    end
+    Client.get(client, "#{@base_path}/#{source}") |> Response.to_struct(Redirect)
   end
 
   @doc "Updates a redirect."
   @spec update(Client.t(), String.t(), map()) ::
-          {:ok, AutoDNS.Redirect.t()} | {:error, AutoDNS.Error.t()}
+          {:ok, Redirect.t()} | {:error, AutoDNS.Error.t()}
   def update(client, source, attrs) do
-    with {:ok, response} <- Client.put(client, "#{@base_path}/#{source}", attrs) do
-      {:ok, AutoDNS.Redirect.from_map(response.object || response.body)}
-    end
+    Client.put(client, "#{@base_path}/#{source}", attrs) |> Response.to_struct(Redirect)
   end
 
   @doc "Deletes a redirect."
   @spec delete(Client.t(), String.t()) :: {:ok, map()} | {:error, AutoDNS.Error.t()}
   def delete(client, source) do
-    with {:ok, response} <- Client.delete(client, "#{@base_path}/#{source}") do
-      {:ok, response.body}
-    end
+    Client.delete(client, "#{@base_path}/#{source}") |> Response.body()
   end
 end

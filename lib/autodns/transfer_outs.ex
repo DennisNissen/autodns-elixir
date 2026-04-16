@@ -9,34 +9,26 @@ defmodule AutoDNS.TransferOuts do
 
   """
 
-  alias AutoDNS.Client
+  alias AutoDNS.{Client, Response, TransferOut}
 
   @base_path "/transferout"
 
   @doc "Searches for outgoing transfers."
-  @spec list(Client.t(), map()) ::
-          {:ok, [AutoDNS.TransferOut.t()]} | {:error, AutoDNS.Error.t()}
+  @spec list(Client.t(), map()) :: {:ok, [TransferOut.t()]} | {:error, AutoDNS.Error.t()}
   def list(client, query \\ %{}) do
-    with {:ok, response} <- Client.post(client, "#{@base_path}/_search", query) do
-      {:ok, AutoDNS.TransferOut.from_list(response.data || [])}
-    end
+    Client.post(client, "#{@base_path}/_search", query) |> Response.to_list(TransferOut)
   end
 
   @doc "Gets an outgoing transfer by domain name."
-  @spec get(Client.t(), String.t()) ::
-          {:ok, AutoDNS.TransferOut.t()} | {:error, AutoDNS.Error.t()}
+  @spec get(Client.t(), String.t()) :: {:ok, TransferOut.t()} | {:error, AutoDNS.Error.t()}
   def get(client, name) do
-    with {:ok, response} <- Client.get(client, "#{@base_path}/#{name}") do
-      {:ok, AutoDNS.TransferOut.from_map(response.object || response.body)}
-    end
+    Client.get(client, "#{@base_path}/#{name}") |> Response.to_struct(TransferOut)
   end
 
   @doc "Answers an outgoing transfer (ACK/NACK)."
   @spec answer(Client.t(), String.t(), String.t(), map()) ::
           {:ok, map()} | {:error, AutoDNS.Error.t()}
   def answer(client, domain, type, attrs \\ %{}) do
-    with {:ok, response} <- Client.post(client, "#{@base_path}/#{domain}/#{type}", attrs) do
-      {:ok, response.body}
-    end
+    Client.post(client, "#{@base_path}/#{domain}/#{type}", attrs) |> Response.body()
   end
 end

@@ -11,21 +11,17 @@ defmodule AutoDNS.ObjectAssignments do
 
   """
 
-  alias AutoDNS.Client
+  alias AutoDNS.{Client, Response}
 
   @doc "Assigns objects to a user."
   @spec assign(Client.t(), map()) :: {:ok, map()} | {:error, AutoDNS.Error.t()}
   def assign(client, attrs) do
-    with {:ok, response} <- Client.put(client, "/object/_assignment", attrs) do
-      {:ok, response.body}
-    end
+    Client.put(client, "/object/_assignment", attrs) |> Response.body()
   end
 
   @doc "Assigns all objects to a user."
   @spec assign_all(Client.t(), map()) :: {:ok, map()} | {:error, AutoDNS.Error.t()}
   def assign_all(client, attrs) do
-    with {:ok, response} <- Client.put(client, "/object/_assignment/all", attrs) do
-      {:ok, response.body}
-    end
+    Client.put(client, "/object/_assignment/all", attrs) |> Response.body()
   end
 end

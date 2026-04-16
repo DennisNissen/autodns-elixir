@@ -141,7 +141,7 @@ client = AutoDNS.client("username", "password",
 - `AutoDNS.Polls` — Poll message handling
 
 ### Infrastructure
-- `AutoDNS.BackupMxOps` — Backup MX configuration
+- `AutoDNS.BackupMxes` — Backup MX configuration
 - `AutoDNS.MailProxies` — Mail proxy management
 - `AutoDNS.Redirects` — URL redirect management
 

@@ -8,14 +8,11 @@ defmodule AutoDNS.SubjectProducts do
 
   """
 
-  alias AutoDNS.Client
+  alias AutoDNS.{Client, Response, SubjectProduct}
 
   @doc "Searches for subject products."
-  @spec list(Client.t(), map()) ::
-          {:ok, [AutoDNS.SubjectProduct.t()]} | {:error, AutoDNS.Error.t()}
+  @spec list(Client.t(), map()) :: {:ok, [SubjectProduct.t()]} | {:error, AutoDNS.Error.t()}
   def list(client, query \\ %{}) do
-    with {:ok, response} <- Client.post(client, "/subjectProduct/_search", query) do
-      {:ok, AutoDNS.SubjectProduct.from_list(response.data || [])}
-    end
+    Client.post(client, "/subjectProduct/_search", query) |> Response.to_list(SubjectProduct)
   end
 end

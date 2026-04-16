@@ -11,47 +11,37 @@ defmodule AutoDNS.DomainStudio do
 
   """
 
-  alias AutoDNS.Client
+  alias AutoDNS.{Client, Response}
 
   @base_path "/domainstudio"
 
   @doc "Searches for available domains via DomainStudio."
   @spec search(Client.t(), map()) :: {:ok, map()} | {:error, AutoDNS.Error.t()}
   def search(client, attrs) do
-    with {:ok, response} <- Client.post(client, @base_path, attrs) do
-      {:ok, response.object || response.body}
-    end
+    Client.post(client, @base_path, attrs) |> Response.object()
   end
 
   @doc "Classifies domains."
   @spec classify(Client.t(), map()) :: {:ok, map()} | {:error, AutoDNS.Error.t()}
   def classify(client, attrs) do
-    with {:ok, response} <- Client.post(client, "#{@base_path}/classify", attrs) do
-      {:ok, response.object || response.body}
-    end
+    Client.post(client, "#{@base_path}/classify", attrs) |> Response.object()
   end
 
   @doc "Checks social media availability."
   @spec social_media_check(Client.t(), map()) :: {:ok, map()} | {:error, AutoDNS.Error.t()}
   def social_media_check(client, attrs) do
-    with {:ok, response} <- Client.post(client, "#{@base_path}/socialmedia", attrs) do
-      {:ok, response.object || response.body}
-    end
+    Client.post(client, "#{@base_path}/socialmedia", attrs) |> Response.object()
   end
 
   @doc "Searches for TLDs available in DomainStudio."
   @spec tlds(Client.t(), map()) :: {:ok, list()} | {:error, AutoDNS.Error.t()}
   def tlds(client, query \\ %{}) do
-    with {:ok, response} <- Client.post(client, "#{@base_path}/tlds/_search", query) do
-      {:ok, response.data || []}
-    end
+    Client.post(client, "#{@base_path}/tlds/_search", query) |> Response.data()
   end
 
   @doc "Gets TLD statistics."
   @spec tld_statistics(Client.t()) :: {:ok, map()} | {:error, AutoDNS.Error.t()}
   def tld_statistics(client) do
-    with {:ok, response} <- Client.get(client, "#{@base_path}/tlds/stats/_search") do
-      {:ok, response.body}
-    end
+    Client.get(client, "#{@base_path}/tlds/stats/_search") |> Response.body()
   end
 end

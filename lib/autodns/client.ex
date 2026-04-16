@@ -19,24 +19,37 @@ defmodule AutoDNS.Client do
           password: String.t(),
           base_url: String.t(),
           context: integer() | nil,
+          auth_header: String.t(),
           opts: keyword()
         }
 
-  defstruct [:username, :password, :base_url, context: nil, opts: []]
+  defstruct [:username, :password, :base_url, :auth_header, context: nil, opts: []]
 
   @default_base_url "https://api.autodns.com/v1"
+
+  @optional_header_map [
+    owner_user: "x-domainrobot-owner-user",
+    owner_context: "x-domainrobot-owner-context",
+    session_id: "x-domainrobot-session-id",
+    two_fa_token: "x-domainrobot-2fa-token",
+    demo: "x-domainrobot-demo",
+    websocket: "x-domainrobot-ws",
+    bulk_limit: "x-domainrobot-bulk-limit"
+  ]
 
   @doc false
   @spec new(String.t(), String.t(), keyword()) :: t()
   def new(username, password, opts \\ []) do
     base_url = Keyword.get(opts, :base_url, @default_base_url)
     context = Keyword.get(opts, :context)
+    auth_header = "Basic " <> Base.encode64("#{username}:#{password}")
 
     %__MODULE__{
       username: username,
       password: password,
       base_url: base_url,
       context: context,
+      auth_header: auth_header,
       opts: opts
     }
   end
@@ -98,68 +111,43 @@ defmodule AutoDNS.Client do
     request(client, :delete, path, body, params)
   end
 
-  # -- Private --
-
   defp request(client, method, path, body, params) do
-    url = client.base_url <> path
-
     req_opts =
       [
         method: method,
-        url: url,
+        url: client.base_url <> path,
         headers: build_headers(client)
       ]
       |> maybe_add_params(params)
       |> maybe_add_body(body)
       |> maybe_add_plug(client)
 
-    try do
-      response = Req.request!(Req.new(req_opts))
-      handle_response(response)
-    rescue
-      e -> {:error, Error.from_exception(e)}
+    case Req.request(Req.new(req_opts)) do
+      {:ok, response} -> handle_response(response)
+      {:error, exception} -> {:error, Error.from_exception(exception)}
     end
   end
 
   defp build_headers(client) do
-    credentials = Base.encode64("#{client.username}:#{client.password}")
-
-    headers = [
-      {"authorization", "Basic #{credentials}"},
+    base = [
+      {"authorization", client.auth_header},
       {"content-type", "application/json"},
       {"accept", "application/json"}
     ]
 
-    headers
+    base
     |> maybe_add_header("x-domainrobot-context", client.context)
-    |> maybe_add_header(
-      "x-domainrobot-owner-user",
-      Keyword.get(client.opts, :owner_user)
-    )
-    |> maybe_add_header(
-      "x-domainrobot-owner-context",
-      Keyword.get(client.opts, :owner_context)
-    )
-    |> maybe_add_header(
-      "x-domainrobot-session-id",
-      Keyword.get(client.opts, :session_id)
-    )
-    |> maybe_add_header(
-      "x-domainrobot-2fa-token",
-      Keyword.get(client.opts, :two_fa_token)
-    )
-    |> maybe_add_header("x-domainrobot-demo", Keyword.get(client.opts, :demo))
-    |> maybe_add_header("x-domainrobot-ws", Keyword.get(client.opts, :websocket))
-    |> maybe_add_header(
-      "x-domainrobot-bulk-limit",
-      Keyword.get(client.opts, :bulk_limit)
-    )
+    |> add_optional_headers(client.opts)
+  end
+
+  defp add_optional_headers(headers, opts) do
+    Enum.reduce(@optional_header_map, headers, fn {opt_key, header_name}, acc ->
+      maybe_add_header(acc, header_name, Keyword.get(opts, opt_key))
+    end)
   end
 
   defp maybe_add_header(headers, _name, nil), do: headers
-
-  defp maybe_add_header(headers, name, value),
-    do: [{name, to_string(value)} | headers]
+  defp maybe_add_header(headers, name, value), do: [{name, to_string(value)} | headers]
 
   defp maybe_add_params(req_opts, []), do: req_opts
   defp maybe_add_params(req_opts, params), do: Keyword.put(req_opts, :params, params)

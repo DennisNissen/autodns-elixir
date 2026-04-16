@@ -80,7 +80,7 @@ defmodule AutoDNS.MixProject do
           AutoDNS.Polls
         ],
         Infrastructure: [
-          AutoDNS.BackupMx,
+          AutoDNS.BackupMxes,
           AutoDNS.MailProxies,
           AutoDNS.Redirects
         ],

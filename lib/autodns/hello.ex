@@ -8,13 +8,11 @@ defmodule AutoDNS.Hello do
 
   """
 
-  alias AutoDNS.Client
+  alias AutoDNS.{Client, Response}
 
   @doc "Performs a health check against the AutoDNS API."
   @spec hello(Client.t()) :: {:ok, map()} | {:error, AutoDNS.Error.t()}
   def hello(client) do
-    with {:ok, response} <- Client.get(client, "/hello") do
-      {:ok, response.body}
-    end
+    Client.get(client, "/hello") |> Response.body()
   end
 end

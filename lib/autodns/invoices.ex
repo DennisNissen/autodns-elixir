@@ -9,25 +9,19 @@ defmodule AutoDNS.Invoices do
 
   """
 
-  alias AutoDNS.Client
+  alias AutoDNS.{Client, Invoice, Response}
 
   @base_path "/invoice"
 
   @doc "Searches for invoices."
-  @spec list(Client.t(), map()) ::
-          {:ok, [AutoDNS.Invoice.t()]} | {:error, AutoDNS.Error.t()}
+  @spec list(Client.t(), map()) :: {:ok, [Invoice.t()]} | {:error, AutoDNS.Error.t()}
   def list(client, query \\ %{}) do
-    with {:ok, response} <- Client.post(client, "#{@base_path}/_search", query) do
-      {:ok, AutoDNS.Invoice.from_list(response.data || [])}
-    end
+    Client.post(client, "#{@base_path}/_search", query) |> Response.to_list(Invoice)
   end
 
   @doc "Gets an invoice by ID."
-  @spec get(Client.t(), integer()) ::
-          {:ok, AutoDNS.Invoice.t()} | {:error, AutoDNS.Error.t()}
+  @spec get(Client.t(), integer()) :: {:ok, Invoice.t()} | {:error, AutoDNS.Error.t()}
   def get(client, id) do
-    with {:ok, response} <- Client.get(client, "#{@base_path}/#{id}") do
-      {:ok, AutoDNS.Invoice.from_map(response.object || response.body)}
-    end
+    Client.get(client, "#{@base_path}/#{id}") |> Response.to_struct(Invoice)
   end
 end

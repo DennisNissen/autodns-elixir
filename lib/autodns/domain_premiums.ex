@@ -8,13 +8,11 @@ defmodule AutoDNS.DomainPremiums do
 
   """
 
-  alias AutoDNS.Client
+  alias AutoDNS.{Client, Response}
 
   @doc "Gets premium domain information."
   @spec get(Client.t(), String.t()) :: {:ok, map()} | {:error, AutoDNS.Error.t()}
   def get(client, name) do
-    with {:ok, response} <- Client.get(client, "/domainpremium/#{name}") do
-      {:ok, response.object || response.body}
-    end
+    Client.get(client, "/domainpremium/#{name}") |> Response.object()
   end
 end

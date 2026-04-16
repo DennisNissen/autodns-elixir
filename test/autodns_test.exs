@@ -1107,28 +1107,28 @@ defmodule AutoDNSTest do
   end
 
   # =============================================
-  # AutoDNS.BackupMxOps
+  # AutoDNS.BackupMxes
   # =============================================
 
-  describe "AutoDNS.BackupMxOps" do
+  describe "AutoDNS.BackupMxes" do
     test "create/2 creates a BackupMx" do
-      {:ok, mx} = AutoDNS.BackupMxOps.create(client(), %{"domain" => "test.com"})
+      {:ok, mx} = AutoDNS.BackupMxes.create(client(), %{"domain" => "test.com"})
       assert %AutoDNS.BackupMx{} = mx
     end
 
     test "list/1 searches BackupMx configurations" do
-      {:ok, mxs} = AutoDNS.BackupMxOps.list(client())
+      {:ok, mxs} = AutoDNS.BackupMxes.list(client())
       assert is_list(mxs)
     end
 
     test "get/2 gets a BackupMx" do
-      {:ok, mx} = AutoDNS.BackupMxOps.get(client(), "example.com")
+      {:ok, mx} = AutoDNS.BackupMxes.get(client(), "example.com")
       assert %AutoDNS.BackupMx{} = mx
       assert mx.domain == "example.com"
     end
 
     test "delete/2 deletes a BackupMx" do
-      {:ok, _} = AutoDNS.BackupMxOps.delete(client(), "example.com")
+      {:ok, _} = AutoDNS.BackupMxes.delete(client(), "example.com")
     end
   end
 

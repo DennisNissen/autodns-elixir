@@ -12,14 +12,12 @@ defmodule AutoDNS.Polls do
 
   """
 
-  alias AutoDNS.Client
+  alias AutoDNS.{Client, Poll, Response}
 
   @doc "Gets the oldest unconfirmed poll message."
-  @spec get(Client.t()) :: {:ok, AutoDNS.Poll.t()} | {:error, AutoDNS.Error.t()}
+  @spec get(Client.t()) :: {:ok, Poll.t()} | {:error, AutoDNS.Error.t()}
   def get(client) do
-    with {:ok, response} <- Client.get(client, "/poll") do
-      {:ok, AutoDNS.Poll.from_map(response.object || response.body)}
-    end
+    Client.get(client, "/poll") |> Response.to_struct(Poll)
   end
 
   @doc "Confirms (acknowledges) a poll message."
