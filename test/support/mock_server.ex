@@ -348,10 +348,6 @@ defmodule AutoDNS.MockServer do
     autodns_json(conn, 200, %{"id" => String.to_integer(id), "name" => "Safe Contact"})
   end
 
-  put "/domainSafeContact/:id" do
-    autodns_json(conn, 200, %{"id" => String.to_integer(id)})
-  end
-
   post "/domainSafeContact/user" do
     autodns_json(conn, 200, conn.body_params)
   end
@@ -362,6 +358,10 @@ defmodule AutoDNS.MockServer do
 
   delete "/domainSafeContact/user/:user/:context" do
     autodns_json(conn, 200, nil)
+  end
+
+  put "/domainSafeContact/:id" do
+    autodns_json(conn, 200, %{"id" => String.to_integer(id)})
   end
 
   post "/domainSafeObject/_search" do
