@@ -116,7 +116,8 @@ defmodule AutoDNS.Users do
   @spec copy(Client.t(), String.t(), integer(), map()) ::
           {:ok, User.t()} | {:error, AutoDNS.Error.t()}
   def copy(client, name, context, attrs \\ %{}) do
-    Client.post(client, "#{@base_path}/#{name}/#{context}/copy", attrs) |> Response.to_struct(User)
+    Client.post(client, "#{@base_path}/#{name}/#{context}/copy", attrs)
+    |> Response.to_struct(User)
   end
 
   @doc "Creates a verification for a user."

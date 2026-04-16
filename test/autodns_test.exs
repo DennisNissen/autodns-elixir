@@ -612,8 +612,7 @@ defmodule AutoDNSTest do
     end
 
     test "update/3 updates a zone" do
-      {:ok, zone} =
-        AutoDNS.Zones.update(client(), "example.com", %{"comment" => "updated"})
+      {:ok, zone} = AutoDNS.Zones.update(client(), "example.com", %{"comment" => "updated"})
 
       assert %AutoDNS.Zone{} = zone
     end
@@ -719,8 +718,7 @@ defmodule AutoDNSTest do
 
   describe "AutoDNS.Contacts" do
     test "create/2 creates a contact" do
-      {:ok, contact} =
-        AutoDNS.Contacts.create(client(), %{"fname" => "John", "lname" => "Doe"})
+      {:ok, contact} = AutoDNS.Contacts.create(client(), %{"fname" => "John", "lname" => "Doe"})
 
       assert %AutoDNS.Contact{} = contact
     end

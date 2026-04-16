@@ -348,10 +348,6 @@ defmodule AutoDNS.MockServer do
     autodns_json(conn, 200, %{"id" => String.to_integer(id), "name" => "Safe Contact"})
   end
 
-  put "/domainSafeContact/:id" do
-    autodns_json(conn, 200, %{"id" => String.to_integer(id)})
-  end
-
   post "/domainSafeContact/user" do
     autodns_json(conn, 200, conn.body_params)
   end
@@ -362,6 +358,10 @@ defmodule AutoDNS.MockServer do
 
   delete "/domainSafeContact/user/:user/:context" do
     autodns_json(conn, 200, nil)
+  end
+
+  put "/domainSafeContact/:id" do
+    autodns_json(conn, 200, %{"id" => String.to_integer(id)})
   end
 
   post "/domainSafeObject/_search" do
@@ -460,7 +460,11 @@ defmodule AutoDNS.MockServer do
   end
 
   patch "/zone/:name/:vns" do
-    autodns_json(conn, 200, Map.merge(%{"origin" => name, "virtualNameServer" => vns}, conn.body_params))
+    autodns_json(
+      conn,
+      200,
+      Map.merge(%{"origin" => name, "virtualNameServer" => vns}, conn.body_params)
+    )
   end
 
   get "/zone/:name/:vns" do
@@ -472,7 +476,11 @@ defmodule AutoDNS.MockServer do
   end
 
   put "/zone/:name/:vns" do
-    autodns_json(conn, 200, Map.merge(%{"origin" => name, "virtualNameServer" => vns}, conn.body_params))
+    autodns_json(
+      conn,
+      200,
+      Map.merge(%{"origin" => name, "virtualNameServer" => vns}, conn.body_params)
+    )
   end
 
   delete "/zone/:name/:vns" do
