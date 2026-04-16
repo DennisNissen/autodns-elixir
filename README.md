@@ -6,14 +6,30 @@ Elixir client for the [AutoDNS JSON API](https://help.internetx.com/pages/viewpa
 
 ## Installation
 
-Add `autodns` to your list of dependencies in `mix.exs`:
+This package is not yet published to Hex. Install it directly from GitHub by adding it to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
   [
-    {:autodns, "~> 0.1.0"}
+    {:autodns, git: "https://github.com/DennisNissen/autodns-elixir.git"}
   ]
 end
+```
+
+To pin to a specific tag or branch:
+
+```elixir
+def deps do
+  [
+    {:autodns, git: "https://github.com/DennisNissen/autodns-elixir.git", tag: "v0.1.0"}
+  ]
+end
+```
+
+Then fetch dependencies:
+
+```bash
+mix deps.get
 ```
 
 ## Quick Start
