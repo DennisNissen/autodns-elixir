@@ -114,19 +114,49 @@ defmodule AutoDNSTest do
       assert response.stid == nil
     end
 
-    test "to_struct/2 falls back to first element of data when object is absent" do
+    test "to_struct/2 uses data[0] when object is absent" do
       body = %{"stid" => "s", "data" => [%{"origin" => "example.com"}]}
       response = AutoDNS.Response.from_body(200, body, [])
       {:ok, zone} = AutoDNS.Response.to_struct({:ok, response}, AutoDNS.Zone)
       assert zone.origin == "example.com"
     end
 
-    test "object/1 prefers object, then data[0], then body" do
+    test "to_struct/2 prefers data[0] over object reference stub" do
+      body = %{
+        "stid" => "s",
+        "object" => %{"type" => "Zone", "value" => "example.com"},
+        "data" => [
+          %{
+            "origin" => "example.com",
+            "resourceRecords" => [
+              %{"name" => "www", "type" => "A", "value" => "1.2.3.4"}
+            ]
+          }
+        ]
+      }
+
+      response = AutoDNS.Response.from_body(200, body, [])
+      {:ok, zone} = AutoDNS.Response.to_struct({:ok, response}, AutoDNS.Zone)
+      assert zone.origin == "example.com"
+      assert [record | _] = zone.resourceRecords
+      assert is_map(record)
+    end
+
+    test "object/1 prefers data[0], then object, then body" do
+      data = AutoDNS.Response.from_body(200, %{"data" => [%{"k" => "d"}]}, [])
+      assert AutoDNS.Response.object({:ok, data}) == {:ok, %{"k" => "d"}}
+
       obj = AutoDNS.Response.from_body(200, %{"object" => %{"k" => "o"}}, [])
       assert AutoDNS.Response.object({:ok, obj}) == {:ok, %{"k" => "o"}}
 
-      data = AutoDNS.Response.from_body(200, %{"data" => [%{"k" => "d"}]}, [])
-      assert AutoDNS.Response.object({:ok, data}) == {:ok, %{"k" => "d"}}
+      both =
+        AutoDNS.Response.from_body(
+          200,
+          %{"object" => %{"k" => "o"}, "data" => [%{"k" => "d"}]},
+          []
+        )
+
+      assert AutoDNS.Response.object({:ok, both}) == {:ok, %{"k" => "d"}}
 
       raw = AutoDNS.Response.from_body(200, %{"k" => "b"}, [])
       assert AutoDNS.Response.object({:ok, raw}) == {:ok, %{"k" => "b"}}

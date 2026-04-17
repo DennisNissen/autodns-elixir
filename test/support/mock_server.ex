@@ -488,12 +488,17 @@ defmodule AutoDNS.MockServer do
   end
 
   get "/zone/:name" do
-    autodns_list(conn, [
-      %{
-        "origin" => name,
-        "resourceRecords" => [%{"name" => "www", "type" => "A", "value" => "1.2.3.4"}]
-      }
-    ])
+    autodns_json(
+      conn,
+      200,
+      %{"type" => "Zone", "value" => name},
+      data: [
+        %{
+          "origin" => name,
+          "resourceRecords" => [%{"name" => "www", "type" => "A", "value" => "1.2.3.4"}]
+        }
+      ]
+    )
   end
 
   put "/zone/:name" do
