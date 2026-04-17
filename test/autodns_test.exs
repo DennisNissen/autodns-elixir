@@ -113,6 +113,24 @@ defmodule AutoDNSTest do
       assert response.body == "raw string"
       assert response.stid == nil
     end
+
+    test "to_struct/2 falls back to first element of data when object is absent" do
+      body = %{"stid" => "s", "data" => [%{"origin" => "example.com"}]}
+      response = AutoDNS.Response.from_body(200, body, [])
+      {:ok, zone} = AutoDNS.Response.to_struct({:ok, response}, AutoDNS.Zone)
+      assert zone.origin == "example.com"
+    end
+
+    test "object/1 prefers object, then data[0], then body" do
+      obj = AutoDNS.Response.from_body(200, %{"object" => %{"k" => "o"}}, [])
+      assert AutoDNS.Response.object({:ok, obj}) == {:ok, %{"k" => "o"}}
+
+      data = AutoDNS.Response.from_body(200, %{"data" => [%{"k" => "d"}]}, [])
+      assert AutoDNS.Response.object({:ok, data}) == {:ok, %{"k" => "d"}}
+
+      raw = AutoDNS.Response.from_body(200, %{"k" => "b"}, [])
+      assert AutoDNS.Response.object({:ok, raw}) == {:ok, %{"k" => "b"}}
+    end
   end
 
   # =============================================
@@ -603,6 +621,7 @@ defmodule AutoDNSTest do
       {:ok, zone} = AutoDNS.Zones.get(client(), "example.com")
       assert %AutoDNS.Zone{} = zone
       assert zone.origin == "example.com"
+      assert [%{"name" => "www", "type" => "A"} | _] = zone.resourceRecords
     end
 
     test "get/3 gets a zone by name and VNS" do

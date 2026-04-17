@@ -60,13 +60,17 @@ defmodule AutoDNS.Response do
   Maps a response `:ok` tuple through `module.from_map/1`, falling back to
   `body` if `object` is nil. Passes `:error` tuples through unchanged.
 
+  Some AutoDNS endpoints (e.g. `GET /zone/{origin}`) return single resources
+  as the first element of `data` rather than in `object`, so `data[0]` is
+  preferred over the envelope body when `object` is absent.
+
       Client.get(client, "/domain/example.com")
       |> Response.to_struct(AutoDNS.Domain)
 
   """
   @spec to_struct(result(), module()) :: {:ok, struct() | nil} | {:error, AutoDNS.Error.t()}
   def to_struct({:ok, %__MODULE__{} = r}, module) do
-    {:ok, module.from_map(r.object || r.body)}
+    {:ok, module.from_map(single_resource(r))}
   end
 
   def to_struct({:error, _} = err, _module), do: err
@@ -86,9 +90,14 @@ defmodule AutoDNS.Response do
 
   def to_list({:error, _} = err, _module), do: err
 
-  @doc "Unwraps a response to the `object || body` map without struct conversion."
+  @doc """
+  Unwraps a response to its single-resource map without struct conversion.
+
+  Prefers `object`, then the first element of `data` (for endpoints that
+  return a single resource inside a `data` array), then the raw `body`.
+  """
   @spec object(result()) :: {:ok, map() | nil} | {:error, AutoDNS.Error.t()}
-  def object({:ok, %__MODULE__{} = r}), do: {:ok, r.object || r.body}
+  def object({:ok, %__MODULE__{} = r}), do: {:ok, single_resource(r)}
   def object({:error, _} = err), do: err
 
   @doc "Unwraps a response to the raw `data` list."
@@ -100,4 +109,8 @@ defmodule AutoDNS.Response do
   @spec body(result()) :: {:ok, map() | list() | binary() | nil} | {:error, AutoDNS.Error.t()}
   def body({:ok, %__MODULE__{body: body}}), do: {:ok, body}
   def body({:error, _} = err), do: err
+
+  defp single_resource(%__MODULE__{object: object}) when is_map(object), do: object
+  defp single_resource(%__MODULE__{data: [first | _]}) when is_map(first), do: first
+  defp single_resource(%__MODULE__{body: body}), do: body
 end
