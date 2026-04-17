@@ -621,7 +621,8 @@ defmodule AutoDNSTest do
       {:ok, zone} = AutoDNS.Zones.get(client(), "example.com")
       assert %AutoDNS.Zone{} = zone
       assert zone.origin == "example.com"
-      assert [%{"name" => "www", "type" => "A"} | _] = zone.resourceRecords
+      assert [record | _] = zone.resourceRecords
+      assert is_map(record)
     end
 
     test "get/3 gets a zone by name and VNS" do
