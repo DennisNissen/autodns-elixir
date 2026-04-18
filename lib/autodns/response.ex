@@ -17,8 +17,11 @@ defmodule AutoDNS.Response do
   - `:body` - Full decoded JSON response body
   - `:headers` - Raw response headers
   - `:stid` - Server transaction ID from the response
-  - `:data` - The `data` list from the response envelope (for list endpoints)
-  - `:object` - The `object` map from the response envelope (for single-resource endpoints)
+  - `:data` - The `data` list from the response envelope; holds the actual
+    resource(s) for both list and single-resource endpoints
+  - `:object` - The `object` map from the response envelope; typically a
+    typed reference stub (`%{"type" => ..., "value" => ...}`) identifying
+    what was returned or acted on, not the full resource
 
   """
 
@@ -57,12 +60,14 @@ defmodule AutoDNS.Response do
   end
 
   @doc """
-  Maps a response `:ok` tuple through `module.from_map/1`, falling back to
-  `body` if `object` is nil. Passes `:error` tuples through unchanged.
+  Maps a response `:ok` tuple through `module.from_map/1`. Passes `:error`
+  tuples through unchanged.
 
-  Some AutoDNS endpoints (e.g. `GET /zone/{origin}`) return single resources
-  as the first element of `data` rather than in `object`, so `data[0]` is
-  preferred over the envelope body when `object` is absent.
+  Many AutoDNS endpoints place the real resource in `data[0]` and use
+  `object` as a typed reference stub (`%{"type" => ..., "value" => ...}`
+  identifying what was acted on). `data[0]` therefore wins over `object`,
+  and `object` is used only when `data` is empty. If neither is populated,
+  the raw envelope `body` is passed through.
 
       Client.get(client, "/domain/example.com")
       |> Response.to_struct(AutoDNS.Domain)
@@ -93,8 +98,9 @@ defmodule AutoDNS.Response do
   @doc """
   Unwraps a response to its single-resource map without struct conversion.
 
-  Prefers `object`, then the first element of `data` (for endpoints that
-  return a single resource inside a `data` array), then the raw `body`.
+  Prefers the first element of `data` (the actual resource payload),
+  then `object` (which is often a typed reference stub on AutoDNS), then
+  the raw `body`.
   """
   @spec object(result()) :: {:ok, map() | nil} | {:error, AutoDNS.Error.t()}
   def object({:ok, %__MODULE__{} = r}), do: {:ok, single_resource(r)}
@@ -110,7 +116,7 @@ defmodule AutoDNS.Response do
   def body({:ok, %__MODULE__{body: body}}), do: {:ok, body}
   def body({:error, _} = err), do: err
 
-  defp single_resource(%__MODULE__{object: object}) when is_map(object), do: object
   defp single_resource(%__MODULE__{data: [first | _]}) when is_map(first), do: first
+  defp single_resource(%__MODULE__{object: object}) when is_map(object), do: object
   defp single_resource(%__MODULE__{body: body}), do: body
 end
